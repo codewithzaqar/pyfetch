@@ -2,7 +2,7 @@
 
 A Python-based command-line system information tool inspired by Neofetch.
 
-## Installation
+## Installation 
 
 ```bash
 pip install pyfetch
