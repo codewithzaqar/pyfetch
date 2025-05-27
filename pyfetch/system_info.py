@@ -2,7 +2,10 @@ import platform
 import psutil
 import os
 import getpass
+import subprocess
+import functools
 
+@functools.lru_cache(maxsize=1)
 def get_system_info():
     """Collect system information."""
     info = {}
@@ -48,6 +51,23 @@ def get_system_info():
             info["Shell"] = shell.split("/")[-1]
         except Exception:
             info["Shell"] = "Unknown"
+
+        # Package Manager
+        try:
+            package = "Unknown"
+            if os_name == "Linux":
+                if os.path.exists("/usr/bin/dpkg"):
+                    result = subprocess.run(["dpkg", "--list"], capture_output=True, text=True)
+                    packages = str(len(result.stdout.splitlines()) - 5) + " (apt)"
+                elif os.path.exists("/usr/bin/rpm"):
+                    result = subprocess.run(["rpm", "-qa"], capture_output=True, text=True)
+                    packages = str(len(result.stdout.splitlines())) + " (yum/rpm)"
+                elif os.path.exists("/usr/bin/pacman"):
+                    result = subprocess.run(["pacman", "-Q"], capture_output=True, text=True)
+                    packages = str(len(result.stdout.splitlines()))
+            info["Packages"] = packages
+        except Exception:
+            info["Packages"] = "Unknown"
 
         return info
     except Exception as e:

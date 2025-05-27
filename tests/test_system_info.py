@@ -12,21 +12,23 @@ class TestSystemInfo(unittest.TestCase):
         self.assertIn("Memory", info)
         self.assertIn("Disk", info)
         self.assertIn("Shell", info)
+        self.assertIn("Packages", info)
 
     def test_display_selected_fields(self):
         info = get_system_info()
-        selected_fields = ["OS", "CPU", "Disk"]
+        selected_fields = ["OS", "CPU", "Packages"]
         filtered_info = {k: v for k, v in info.items() if k in selected_fields}
         self.assertEqual(len(filtered_info), 3)
         self.assertIn("OS", filtered_info)
         self.assertIn("CPU", filtered_info)
-        self.assertIn("Disk", filtered_info)
+        self.assertIn("Packages", filtered_info)
 
-    def test_load_config(self):
+    def test_load_config_with_ascii(self):
         config = load_config()
         self.assertIsInstance(config, dict)
         self.assertIn("no_art", config)
         self.assertIn("color_key", config)
+        self.assertIn("ascii_art", config)
 
 if __name__ == "__main__":
     unittest.main()

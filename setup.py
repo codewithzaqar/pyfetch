@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="pyfetch",
-    version="0.0.3",
+    version="0.0.4",
     author="codewithzaqar",
     description="A Python-based CLI system information tool inspired by Neofetch",
     packages=find_packages(),
