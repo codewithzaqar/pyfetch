@@ -28,6 +28,13 @@ def get_system_info():
         except Exception:
             info["Memory"] = "Unknown"
 
+        # Disk Usage
+        try:
+            disk = psutil.disk_usage("/")
+            info["Disk"] = f"{disk.used / {1024 ** 3}:.1f} GiB / {disk.total / {1024 ** 3}:.1f} GiB"
+        except Exception:
+            info["Disk"] = "Unknown"
+
         # Uptime
         try:
             uptime_seconds = psutil.boot_time()
