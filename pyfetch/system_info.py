@@ -1,38 +1,47 @@
 import platform
 import psutil
 import os
+import getpass
 
 def get_system_info():
     """Collect system information."""
+    info = {}
     try:
         # OS Information
         os_name = platform.system()
-        os_release = platform.release()
-        os_version = platform.version()
+        info["OS"] = f"{os_name} {platform.release()}"
+        info["Version"] = platform.version()
 
         # Kernel
         kernel = platform.uname().release if os_name != "Windows" else platform.release()
 
         # CPU
-        cpu = platform.processor()
-        cpu_cores = psutil.cpu_count(logical=True)
+        try:
+            info["CPU"] = f"{platform.processor()} ({psutil.cpu_count(logical=True)} cores)"
+        except Exception:
+            info["CPU"] = "Unknown"
 
         # Memory
-        memory = psutil.virtual_memory()
-        total_memory = memory.total / (1024 ** 3)  # Convert to GB
-        used_memory = memory.used / (1024 ** 3)    # Convert to GB
+        try:
+            memory = psutil.virtual_memory()
+            info["Memory"] = f"{memory.used / (1024 ** 3):.1f} GiB / {memory.total / (1024 ** 3):.1f} GiB"
+        except Exception:
+            info["Memory"] = "Unknown"
 
         # Uptime
-        uptime_seconds = psutil.boot_time()
-        uptime = f"{int(uptime_seconds // 3600)} hours, {int((uptime_seconds % 3600) // 60)} mins"
+        try:
+            uptime_seconds = psutil.boot_time()
+            info["Uptime"] = f"{int(uptime_seconds // 3600)} hours, {int((uptime_seconds % 3600) // 60)} mins"
+        except Exception:
+            info["Uptime"] = "Unknown"
 
-        return {
-            "OS": f"{os_name} {os_release}",
-            "Version": os_version,
-            "Kernel": kernel,
-            "CPU": f"{cpu} ({cpu_cores} cores)",
-            "Memory": f"{used_memory:.1f} GiB / {total_memory:.1f} GiB",
-            "Uptime": uptime
-        }
+        # Shell
+        try:
+            shell = os.environ.get("SHELL", getpass.getuser() + "@" + os_name)
+            info["Shell"] = shell.split("/")[-1]
+        except Exception:
+            info["Shell"] = "Unknown"
+
+        return info
     except Exception as e:
         return {"Error": f"Failed to gather system info: {str(e)}"}
